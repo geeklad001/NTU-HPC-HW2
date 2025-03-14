@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <omp.h>
 
 // For debugging
 void test();
@@ -109,6 +110,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
     loadPaddedMatrix(P, M, w, k);
 
     // Convolution
+    #pragma omp parallel for
     for (int i = 0; i < w; ++i) {
         for (int j = 0; j < w; ++j) {
             // dot product of the part of the matrix with the kernel.
