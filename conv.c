@@ -4,76 +4,8 @@
 #include <time.h>
 #include <string.h>
 
-// For debugging
-void test();
-
 void loadPaddedMatrix(int *P, int *M, int w, int k);
 void conv(int* M, int w, int* K, int k, int* C);
-
-void test() {
-    // Matrix Width
-    int w = 7;
-    // The Matrix
-    int *M = malloc(sizeof(int) * w * w);
-    // The Answer Matrix
-    int *C = malloc(sizeof(int) * w * w);
-    // Fill the matrix with 1, 2, 3, 4, ..., etc.
-    for (int i = 0; i < w*w; ++i) M[i] = i+1;
-    
-    // Kernel Width
-    int k = 3;
-    // The Kernel
-    int *K = malloc(sizeof(int) * k * k);
-
-    // Initilize an identity kernel
-    memset(K, 0, k * k * sizeof(int));
-    K[k * (k/2) + k/2] = 1;
-    // printf("Kernel: \n");
-    // for (int i = 0; i < k; ++i) {
-    //     for (int j = 0; j < k; ++j) {
-    //         printf("%d ", K[i*k + j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    // Pad width
-    int pw = k/2;
-    // Padded Matrix Width
-    int pmw = w + 2*pw;
-
-    // // Prepare a matrix with
-    // int *P = malloc(sizeof(int) * pmw * pmw);
-    // memset(P, 0, pmw * pmw * sizeof(int));
-    // loadPaddedMatrix(P, M, w, k);
-    
-    // for (int i = 0; i < pmw; ++i) {
-    //     for (int j = 0; j < pmw; ++j) {
-    //         printf("%d ", P[i*pmw + j]);
-    //     }
-    //     printf("\n");
-    // }
-    // free(P);
-
-    printf("Original Matrix: \n");
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < w; ++j) {
-            printf("%d ", M[i*w + j]);
-        }
-        printf("\n");
-    }
-    conv(M, w, K, k, C);
-    printf("After Convolution Matrix: \n");
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < w; ++j) {
-            printf("%d ", C[i*w + j]);
-        }
-        printf("\n");
-    }
-    
-    free(M);
-    free(K);
-    free(C);
-}
 
 void loadPaddedMatrix(int *P, int *M, int w, int k) {
     // Pad width
@@ -164,9 +96,6 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Usage: %s MATRIX KERNEL ANSWER\n", argv[0]);
         return 1;
     }
-
-    // For testing
-    // test();
 
     // Inputs are always square matrices.
     int w, k; // w ranged from 256x256 to 4096x4096
