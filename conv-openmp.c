@@ -45,7 +45,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
     loadPaddedMatrix(P, M, w, k);
 
     // Convolution
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for collapse(2) schedule(dynamic)
     for (int i = 0; i < w; ++i) {
         for (int j = 0; j < w; ++j) {
             // dot product of the part of the matrix with the kernel.
