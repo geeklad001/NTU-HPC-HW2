@@ -108,12 +108,13 @@ int main(int argc, char* argv[]) {
     conv(M, w, K, k, C);
     clock_gettime(CLOCK_MONOTONIC, &end);
 
+    double elapsed_time = (end.tv_sec - beg.tv_sec) * 1e6 + (end.tv_nsec - beg.tv_nsec) / 1e3;
     if (verify(argv[3], C, w)) {
-        double elapsed_time = (end.tv_sec - beg.tv_sec) * 1e6 + (end.tv_nsec - beg.tv_nsec) / 1e3;
-        printf("Correct!\nElapsed time: %.2lf us\n", elapsed_time);
+        printf("Correct! ");
     } else {
-        puts("Wrong!");
+        printf("Wrong! ");
     }
+    printf("Time taken: %.2lf us\n", elapsed_time);
 
     free(M);
     free(K);
