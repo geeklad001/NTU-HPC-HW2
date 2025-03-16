@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <omp.h>
-#include <sys/mman.h> // For mmap and MAP_HUGETLB
+#include <immintrin.h> // For aligned memory allocation
 
 // For debugging
 void test();
@@ -38,11 +38,8 @@ void conv(int* M, int w, int* K, int k, int* C) {
     int pmw = w + 2*pw;
 
     // Padded Matrix P
-    int *P = mmap(NULL, sizeof(int) * pmw * pmw, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
-    if (P == MAP_FAILED) {
-        perror("mmap");
-        exit(EXIT_FAILURE);
-    }
+    int *P;
+    posix_memalign((void**)&P, 64, sizeof(int) * pmw * pmw);
     memset(P, 0, pmw * pmw * sizeof(int));
     loadPaddedMatrix(P, M, w, k);
 
@@ -68,7 +65,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
         }
     }
 
-    munmap(P, sizeof(int) * pmw * pmw);
+    free(P);
 }
 
 int* readMatrix(const char* file_path, int* w) {
