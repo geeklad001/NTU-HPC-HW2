@@ -4,6 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <omp.h>
+#include <sys/mman.h> // For mmap and MAP_HUGETLB
 
 // For debugging
 void test();
@@ -31,36 +32,43 @@ void loadPaddedMatrix(int *P, int *M, int w, int k) {
  *    padded convolution of M and K
  */
 void conv(int* M, int w, int* K, int k, int* C) {
-    // TODO: your serial convolution implementation
-    // NOTE: you can use the same template for the parallelized version
-
     // Pad width pw
     int pw = k/2;
     // Padded Matrix Width pmw
     int pmw = w + 2*pw;
 
     // Padded Matrix P
-    int *P = malloc(sizeof(int) * pmw * pmw);
+    int *P = mmap(NULL, sizeof(int) * pmw * pmw, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+    if (P == MAP_FAILED) {
+        perror("mmap");
+        exit(EXIT_FAILURE);
+    }
     memset(P, 0, pmw * pmw * sizeof(int));
     loadPaddedMatrix(P, M, w, k);
 
-    // Convolution
-    // Collapse two layers of for loops for OpenMP to parallel compute, using dynamic scheduloing.
+    // Block size (tunable parameter)
+    int blockSize = 32;
+
+    // Convolution with blocking and reduction
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < w; ++j) {
-            // dot product of the part of the matrix with the kernel.
-            int dp = 0;
-            for (int a = 0; a < k; ++a) {
-                for (int b = 0; b < k; ++b) {
-                    dp += P[(i+a)*pmw + j+b] * K[a*k + b];
+    for (int ii = 0; ii < w; ii += blockSize) {
+        for (int jj = 0; jj < w; jj += blockSize) {
+            for (int i = ii; i < ii + blockSize && i < w; ++i) {
+                for (int j = jj; j < jj + blockSize && j < w; ++j) {
+                    // dot product of the part of the matrix with the kernel.
+                    int dp = 0;
+                    for (int a = 0; a < k; ++a) {
+                        for (int b = 0; b < k; ++b) {
+                            dp += P[(i+a)*pmw + j+b] * K[a*k + b];
+                        }
+                    }
+                    C[i*w + j] = dp;
                 }
             }
-            C[i*w + j] = dp;
         }
     }
 
-    free(P);
+    munmap(P, sizeof(int) * pmw * pmw);
 }
 
 int* readMatrix(const char* file_path, int* w) {
