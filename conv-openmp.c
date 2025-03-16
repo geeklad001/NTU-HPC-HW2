@@ -44,19 +44,25 @@ void conv(int* M, int w, int* K, int k, int* C) {
     memset(P, 0, pmw * pmw * sizeof(int));
     loadPaddedMatrix(P, M, w, k);
 
-    // Convolution
-    // Collapse two layers of for loops for OpenMP to parallel compute, using dynamic scheduloing.
+    // Block size (tunable parameter)
+    int blockSize = 32;
+
+    // Convolution with blocking and reduction
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < w; ++j) {
-            // dot product of the part of the matrix with the kernel.
-            int dp = 0;
-            for (int a = 0; a < k; ++a) {
-                for (int b = 0; b < k; ++b) {
-                    dp += P[(i+a)*pmw + j+b] * K[a*k + b];
+    for (int ii = 0; ii < w; ii += blockSize) {
+        for (int jj = 0; jj < w; jj += blockSize) {
+            for (int i = ii; i < ii + blockSize && i < w; ++i) {
+                for (int j = jj; j < jj + blockSize && j < w; ++j) {
+                    // dot product of the part of the matrix with the kernel.
+                    int dp = 0;
+                    for (int a = 0; a < k; ++a) {
+                        for (int b = 0; b < k; ++b) {
+                            dp += P[(i+a)*pmw + j+b] * K[a*k + b];
+                        }
+                    }
+                    C[i*w + j] = dp;
                 }
             }
-            C[i*w + j] = dp;
         }
     }
 
