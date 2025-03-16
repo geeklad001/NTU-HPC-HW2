@@ -45,6 +45,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
     loadPaddedMatrix(P, M, w, k);
 
     // Convolution
+    // Collapse two layers of for loops for OpenMP to parallel compute, using dynamic scheduloing.
     #pragma omp parallel for collapse(2) schedule(dynamic)
     for (int i = 0; i < w; ++i) {
         for (int j = 0; j < w; ++j) {
