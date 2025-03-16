@@ -4,9 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <omp.h>
-
-// For debugging
-void test();
+#include <immintrin.h> // For aligned memory allocation
 
 void loadPaddedMatrix(int *P, int *M, int w, int k);
 void conv(int* M, int w, int* K, int k, int* C);
@@ -40,7 +38,9 @@ void conv(int* M, int w, int* K, int k, int* C) {
     int pmw = w + 2*pw;
 
     // Padded Matrix P
-    int *P = malloc(sizeof(int) * pmw * pmw);
+    int *P;
+    // Use aligned memory allocation for better performance.
+    posix_memalign((void**)&P, 64, sizeof(int) * pmw * pmw);
     memset(P, 0, pmw * pmw * sizeof(int));
     loadPaddedMatrix(P, M, w, k);
 
@@ -103,9 +103,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // For testing
-    // test();
-
     // Inputs are always square matrices.
     int w, k; // w ranged from 256x256 to 4096x4096
     int* M = readMatrix(argv[1], &w);
@@ -119,9 +116,9 @@ int main(int argc, char* argv[]) {
 
     if (verify(argv[3], C, w)) {
         double elapsed_time = (end.tv_sec - beg.tv_sec) * 1e6 + (end.tv_nsec - beg.tv_nsec) / 1e3;
-        printf("Correct!\nElapsed time: %.2lf us\n", elapsed_time);
+        printf("Correct! Time taken: %.2lf us\n", elapsed_time);
     } else {
-        puts("Wrong!");
+        printf("Wrong! Time taken: %.2lf us\n", elapsed_time);
     }
 
     free(M);
