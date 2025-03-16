@@ -7,7 +7,7 @@ num_threads=(1 2 4)       # Number of threads
 num_runs=100                      # Number of times to repeat each test
 
 # Output file for collecting data
-output_file="execution_times_c2_dy(local).csv"
+output_file="execution_times_c2_dy_blk_reduc(local).csv"
 
 # Create a header for the CSV file
 echo "Matrix Size,Kernel Size,Threads,Run ID,Execution Time (Seconds)" > $output_file
