@@ -2,4 +2,3 @@
 *.txt
 conv
 conv-openmp
-*.csv
