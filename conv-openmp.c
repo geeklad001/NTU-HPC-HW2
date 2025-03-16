@@ -46,7 +46,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
 
     // Convolution
     // Collapse two layers of for loops for OpenMP to parallel compute, using dynamic scheduloing.
-    #pragma omp parallel for collapse(2) schedule(dynamic)
+    #pragma omp parallel for collapse(2)
     for (int i = 0; i < w; ++i) {
         for (int j = 0; j < w; ++j) {
             // dot product of the part of the matrix with the kernel.
