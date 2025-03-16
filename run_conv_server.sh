@@ -3,7 +3,7 @@
 # Define the variations for matrix size, kernel size, and number of threads
 matrix_sizes=(256 512 1024 4096)  # Matrix sizes
 kernel_sizes=(3 5 7 9)            # Kernel sizes
-num_threads=(1 2 4 8 16 32)       # Number of threads
+num_threads=(1 2 4 8 16 32)               # Number of threads
 num_runs=30                       # Number of times to repeat each test
 
 # Output file for collecting data

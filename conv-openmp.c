@@ -6,6 +6,9 @@
 #include <omp.h>
 #include <immintrin.h> // For aligned memory allocation
 
+// For debugging
+void test();
+
 void loadPaddedMatrix(int *P, int *M, int w, int k);
 void conv(int* M, int w, int* K, int k, int* C);
 
@@ -44,7 +47,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
     int blockSize = 32;
 
     // Convolution with blocking and reduction
-    #pragma omp parallel for collapse(2) schedule(dynamic) reduction(+:dp)
+    #pragma omp parallel for collapse(2) schedule(dynamic)
     for (int ii = 0; ii < w; ii += blockSize) {
         for (int jj = 0; jj < w; jj += blockSize) {
             for (int i = ii; i < ii + blockSize && i < w; ++i) {
@@ -121,11 +124,10 @@ int main(int argc, char* argv[]) {
 
     double elapsed_time = (end.tv_sec - beg.tv_sec) * 1e6 + (end.tv_nsec - beg.tv_nsec) / 1e3;
     if (verify(argv[3], C, w)) {
-        printf("Correct! ");
+        printf("Correct! Time taken: %.2lf us\n", elapsed_time);
     } else {
-        printf("Wrong! ");
+        printf("Wrong! Time taken: %.2lf us\n", elapsed_time);
     }
-    printf("Time taken: %.2lf us\n", elapsed_time);
 
     free(M);
     free(K);
