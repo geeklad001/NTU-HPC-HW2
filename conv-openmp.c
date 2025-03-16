@@ -48,7 +48,7 @@ void conv(int* M, int w, int* K, int k, int* C) {
     int blockSize = 32;
 
     // Convolution with blocking and reduction
-    #pragma omp parallel for collapse(2) schedule(dynamic)
+    #pragma omp parallel for collapse(2) schedule(guided)
     for (int ii = 0; ii < w; ii += blockSize) {
         for (int jj = 0; jj < w; jj += blockSize) {
             for (int i = ii; i < ii + blockSize && i < w; ++i) {
