@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # List of branches to run the script on
-branches=("dy" "dy-align" "dy-align-blk" "guided" "guided-align" "guided-align-blk" "static" "static-align" "static-align-blk")
+branches=("dy" "guided" "static")
 
 # Path to the run_conv_server.sh script
 non_openmp_script_path="./run_conv_non_openmp.sh"
