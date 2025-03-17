@@ -13,25 +13,11 @@ output_file="execution_times_static.csv"
 echo "Matrix Size,Kernel Size,Threads,Run ID,Execution Time (Microseconds),Correctness" > $output_file
 
 # Compile the programs
-gcc conv.c -o conv
 gcc conv-openmp.c -o conv-openmp -fopenmp
 
 # Loop through all combinations of matrix size and kernel size
 for matrix_size in "${matrix_sizes[@]}"; do
     for kernel_size in "${kernel_sizes[@]}"; do
-        # Run the non-OpenMP version for specific number of times
-        for run_id in $(seq 1 $num_runs); do
-            echo "Running non-OpenMP: Matrix ${matrix_size}x${matrix_size}, Kernel ${kernel_size}, Run ${run_id}..."
-            
-            # Collect execution time and correctness
-            result=$(./conv "mat-${matrix_size}.txt" "ker-${kernel_size}.txt" "ans-${matrix_size}-${kernel_size}.txt" | grep "Time taken")
-            exec_time=$(echo $result | awk '{print $4}')
-            correctness=$(echo $result | awk '{print $1}')
-
-            # Append the result to the CSV file
-            echo "${matrix_size}x${matrix_size},${kernel_size},1,${run_id},${exec_time},${correctness}" >> $output_file
-        done
-
         # Run the OpenMP version for different thread counts for specific number of times each
         for threads in "${num_threads[@]}"; do
             for run_id in $(seq 1 $num_runs); do
