@@ -4,16 +4,18 @@
 branches=("dy" "dy-align" "dy-align-blk" "guided" "guided-align" "guided-align-blk" "static" "static-align" "static-align-blk")
 
 # Path to the run_conv_server.sh script
-script_path="./run_conv_server.sh"
+non_openmp_script_path="./run_conv_non_openmp.sh"
+openmp_script_path="./run_conv_openmp.sh"
 
 # Loop through each branch
+bash $non_openmp_script_path
 for branch in "${branches[@]}"; do
     echo "Checking out branch: $branch"
     git checkout $branch
 
     # Run the script
     echo "Running script on branch: $branch"
-    bash $script_path
+    bash $openmp_script_path
 
     # Add and commit the results to the repository
     git add *.csv
